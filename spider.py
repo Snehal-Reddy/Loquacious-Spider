@@ -77,7 +77,7 @@ def voice (frame, put,link):
 
 	#weather
 	if any('weather' in put):
-		APIKEY = 1410da5b0f0ff5516b2f76b454bf7c15
+		APIKEY = '1410da5b0f0ff5516b2f76b454bf7c15'
 		speak.say("which city's forecast would you like ?")
 		with sr.Microphone() as source:
 			speak.say('Hey I am Listening ')
