@@ -121,7 +121,7 @@ class GUI(tk.Frame):
 		self.textBox.focus_set()
 
 		speak.say('''Hi mortal ! Loquacious Spider here .''')
-		speak.say( ''' Would like news or weather information or facts ?''')
+		speak.say( ''' Would like news or weather information  ?''')
 		speak.runAndWait()
 
 		self.photo1 = tk.PhotoImage(file="mic_icon.png")
