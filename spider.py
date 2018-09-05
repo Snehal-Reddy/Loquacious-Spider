@@ -6,7 +6,6 @@ import webbrowser
 import json
 import requests
 import ctypes
-import youtube_dl
 import random
 import urllib
 import ssl
@@ -77,7 +76,7 @@ def voice (frame, put,link):
 
 	#weather
 	if any('weather' in put):
-		APIKEY = '1410da5b0f0ff5516b2f76b454bf7c15'
+		APIKEY = "1410da5b0f0ff5516b2f76b454bf7c15"
 		speak.say("which city's forecast would you like ?")
 		with sr.Microphone() as source:
 			speak.say('Hey I am Listening ')
@@ -89,7 +88,7 @@ def voice (frame, put,link):
 			put1_weather = put1_weather.strip()
 			location = put1_weather
 
-			url = "http://api.openweathermap.org/data/2.5/find?q=%s&units=metric&APPID=%s" %(location,APIKEY)
+			url = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID=%s" %(location,APIKEY)
 			response = requests.get(url)
 			response_dict = json.loads(response.text)
 		
@@ -104,14 +103,32 @@ def voice (frame, put,link):
 		
 
 class GUI(tk.Frame):
-	def __init__(self, arg):
+	def __init__(self, *args,**kwargs):
 		tk.Frame.__init__(self,*args,**kwargs)
 
 		#insert GUI objects
 		#frame and all have to be designed
+		self.textBox = tk.Text(root,
+			height=1,width=30,
+			font=("Times", 16),
+			bg="#666", fg="#0f0",
+			spacing1=6, spacing3=6,
+			insertbackground="#0f0"
+			)
+		self.textBox.insert("1.0", "$>")
+		self.textBox.grid(row=1,column=1, padx=10, pady=10)
+		root.bind('<Return>', self.OnEnter)
+		self.textBox.focus_set()
 
 		speak.say('''Hi mortal ! Loquacious Spider here .''')
 		speak.say( ''' Would like news or weather information or facts ?''')
+		speak.runAndWait()
+
+		self.photo1 = tk.PhotoImage(file="mic_icon.png")
+
+		self.btn = ttk.Button(root,command=self.OnClicked,
+		image=self.photo1, style="C.TButton")
+		self.btn.grid(row=1,column=2, padx=10, pady=20)
 
 	def OnClicked(self):
 		recogniser = sr.Recognizer()
@@ -132,4 +149,55 @@ class GUI(tk.Frame):
 			speak.say("Could not understand audio")
 		except sr.RequestError as e:
 			speak.say("Could not request results")
+
+	def OnEnter(self,event):
+			put=self.textBox.get("1.2","end-1c")
+			print(put)
+			self.textBox.delete('1.2',tk.END)
+			if put.startswith(search_pc):
+				put = put.strip()
+				link = put.split()
+			#put = re.sub(r'[?|$|.|!]', r'', put)
+			else:
+				put = put.lower()
+				put = put.strip()
+				link = put.split()
+			events(self, put, link)
+			if put=='':
+				self.displayText('Reenter')
+
+	def displayText(self, text):
+		try :
+			if not self.output_window.winfo_viewable() :
+				self.output_window.update()
+				self.output_window.deiconify()
+		except :
+			self.createOutputWindow()
+		print(text)
+
+	def createOutputWindow(self):
+		self.output_window = tk.Toplevel()
+		output_text_window = tk.Text(self.output_window)
+		self.stddirec = StdRedirector(output_text_window)
+		sys.stdout = self.stddirec
+		output_text_window.pack()
+
+	#Trigger the GUI. Light the fuse!
+if __name__=="__main__":
+	root = tk.Tk()
+	view = GUI(root)
+	style = ttk.Style()
+	style.configure('C.TButton',
+		background='#555',
+		highlightthickness='0'
+	)
+	style.map("C.TButton",
+		background=[('pressed', '!disabled', '#333'), ('active', '#666')]
+	)
+
+	root.iconphoto(True, tk.PhotoImage(file=os.path.join(sys.path[0],'lucas-the-spider.gif')))
+	root.title('Loquacious Spider')
+	root.configure(background="#444")
+	root.resizable(0,0)
+	root.mainloop()
 		
