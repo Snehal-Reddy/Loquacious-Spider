@@ -37,7 +37,7 @@ speak = pyttsx3.init()
 def voice (frame, put,link):
 
 	#news
-	if any('news' in  put):
+	if 'news' in  put:
 		speak.say('Which news agency would you prefer today ? BBC , ESPN or al jazeera ? ')
 		recogniser = sr.Recognizer()
 		with sr.Microphone() as source:
@@ -52,7 +52,7 @@ def voice (frame, put,link):
 			say1 = '+'.join(link1)
 			if link1[1] == "al" and link[2] == "jazeera":
 				say1 += "-english"
-			elif link1[1] == "bbc":
+			elif link1[1] == "BBC":
 				say1 += "-news"
 			elif link1[1] == "espn" and link[2] == "cric":
 				say1 += "-info"
@@ -75,9 +75,10 @@ def voice (frame, put,link):
 			speak.say('Unable to retrieve data!')
 
 	#weather
-	if any('weather' in put):
+	if 'weather' in put:
 		APIKEY = "1410da5b0f0ff5516b2f76b454bf7c15"
 		speak.say("which city's forecast would you like ?")
+		recogniser = sr.Recognizer()
 		with sr.Microphone() as source:
 			speak.say('Hey I am Listening ')
 			speak.runAndWait()
@@ -144,30 +145,25 @@ class GUI(tk.Frame):
 			put=put.lower()
 			put = put.strip()
 			link=put.split()
+			print("OnClicked+"+put)
 			voice(self,put,link)
 		except sr.UnknownValueError:
 			speak.say("Could not understand audio")
 		except sr.RequestError as e:
-			speak.say("Could not request results")
+			speak.say("Could not request results{0}".format(e))
 
 	def OnEnter(self,event):
 			put=self.textBox.get("1.2","end-1c")
 			print(put)
+			link=put.split()
 			self.textBox.delete('1.2',tk.END)
-			if put.startswith(search_pc):
-				put = put.strip()
-				link = put.split()
-			#put = re.sub(r'[?|$|.|!]', r'', put)
-			else:
-				put = put.lower()
-				put = put.strip()
-				link = put.split()
-			events(self, put, link)
+			voice(self, put, link)
 			if put=='':
 				self.displayText('Reenter')
 
 	def displayText(self, text):
 		try :
+			self.output_window = tk.Toplevel()
 			if not self.output_window.winfo_viewable() :
 				self.output_window.update()
 				self.output_window.deiconify()
